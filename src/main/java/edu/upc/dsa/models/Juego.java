@@ -52,6 +52,16 @@ public class Juego {
         this.equipos.add(equipos);
     }
 
+    public List<Equipo> getEquipos(){
+        return this.equipos;
+    }
+
+    public void CrearEquipos(String idEquipo, int numPersonas){
+        for (int i=0; i<numEquipos;i++){
+            equipos.add(new Equipo(idEquipo,numPersonas));
+        }
+    }
+
     @Override
     public String toString() {
         return "Juego [numUsuarios = " + numUsuarios +"]";

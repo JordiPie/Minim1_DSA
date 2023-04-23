@@ -5,15 +5,19 @@ import java.util.List;
 
 public class Equipo {
     List<Usuario> usuarios;
-    String idEquipo;
+    Integer numEquipo;
+    Integer numPersonas;
 
     public Equipo() {    }
 
-    public Equipo(String idEquipo) {
+    public Equipo(int numEquipo, int numPersonas) {
         this();
         this.setUsuarios(new ArrayList<Usuario>());
-        this.setIdEquipo(idEquipo);
+        this.setNumEquipo(numEquipo);
+        this.setNumPersonas(numPersonas);
     }
+
+
 
 
     public void setUsuarios(List<Usuario> usuarios) {
@@ -23,16 +27,26 @@ public class Equipo {
         this.usuarios.add(usuarios);
     }
 
-    public String  getIdEquipo() {
-        return idEquipo;
+    public int getNumEquipo() {
+        return numEquipo;
     }
 
-    public void setIdEquipo(String idEquipo) {
-        this.idEquipo = idEquipo;
+    public void setNumEquipo(int numEquipo) {
+        this.numEquipo = numEquipo;
     }
+
+    public Integer  getNumPersonas() {
+        return numPersonas;
+    }
+
+    public void setNumPersonas(Integer numPersonas) {
+        this.numPersonas = numPersonas;
+    }
+
+
 
     @Override
     public String toString() {
-        return "Juego [idEquipo = " + idEquipo +"]";
+        return "Juego [numPersonas = " + numPersonas +"]";
     }
 }

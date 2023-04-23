@@ -1,9 +1,7 @@
 package edu.upc.dsa;
 
-import edu.upc.dsa.models.Exceptions.JuegoDoesNotExistException;
-import edu.upc.dsa.models.Exceptions.UserCurrentlyPlayingException;
-import edu.upc.dsa.models.Exceptions.UserDoesNotExistException;
-import edu.upc.dsa.models.Exceptions.UserNotCurrentlyPlayingException;
+import edu.upc.dsa.models.Equipo;
+import edu.upc.dsa.models.Exceptions.*;
 import edu.upc.dsa.models.Juego;
 import edu.upc.dsa.models.Partida;
 import edu.upc.dsa.models.Usuario;
@@ -13,16 +11,17 @@ import java.util.*;
 import org.apache.log4j.Logger;
 
 import static java.lang.Integer.parseInt;
-import static java.util.stream.Collectors.toList;
 
 public class GameManagerImpl implements GameManager {
     private static GameManager instance;
-    protected Map<String, Usuario> playersList; //string = username; Player = player
+    private static Juego juego;
+    protected Map<String, Usuario> usuario; //string = username; Player = player
     protected  List<Juego> juegos; // catalogo de juegos
+    LinkedList<String> listaUsuarios = new LinkedList<String>();
     final static Logger logger = Logger.getLogger(GameManagerImpl.class);
 
     public GameManagerImpl() {
-        this.playersList = new HashMap<>();
+        this.usuario = new HashMap<>();
         this.juegos= new ArrayList<>();
     }
 
@@ -47,16 +46,16 @@ public class GameManagerImpl implements GameManager {
     }
 
     @Override
-    public Partida iniciarPartida(String idPartida, String idUsuario) throws JuegoDoesNotExistException, UserCurrentlyPlayingException {
-        Juego j = getJuego(idPartida);
+    public Partida iniciarPartida(int idPartida, String idUsuario) throws JuegoDoesNotExistException, UserCurrentlyPlayingException {
+        Juego j = getJuego(String.valueOf(idPartida));
         if (j==null){
             throw new JuegoDoesNotExistException();
         }
-        Usuario usuario = this.playersList.get(idUsuario);
+        Usuario usuario = this.usuario.get(idUsuario);
         if (usuario ==null){
             Usuario newplayer = new Usuario(idUsuario);
             logger.info("New player: "+newplayer);
-            this.playersList.put(idUsuario, newplayer);
+            this.usuario.put(idUsuario, newplayer);
         }else{
             if(usuario.getCurrentlyPlaying()){
                 logger.info("This player is currently playing");
@@ -64,7 +63,7 @@ public class GameManagerImpl implements GameManager {
             }
         }
         Partida newpartida = new Partida(idUsuario, idPartida);
-        this.playersList.get(idUsuario).addPartida(newpartida);
+        this.usuario.get(idUsuario).addPartida(newpartida);
         logger.info("New partida: "+newpartida);
 
         return newpartida;
@@ -72,10 +71,10 @@ public class GameManagerImpl implements GameManager {
 
     @Override
     public String getVidaActual(String iduser) throws UserDoesNotExistException, UserNotCurrentlyPlayingException {
-        Partida p = getPartidaActual(iduser);
+        String p = getVidaActual(iduser);
         if(p!=null){
-            logger.info("You are in level "+p.getVidaJugador().toString());
-            return p.getVidaJugador().toString();
+            logger.info("Tienes esta vida: "+p.getVida().toString());
+            return p.getVida().toString();
         }
         return null;
     }
@@ -86,33 +85,40 @@ public class GameManagerImpl implements GameManager {
     public Usuario endPartida(String iduser) throws UserDoesNotExistException, UserNotCurrentlyPlayingException {
         Partida p = getPartidaActual(iduser);
         if(p!=null){
-            this.playersList.get(iduser).setCurrentlyPlaying(false);
+            this.usuario.get(iduser).setCurrentlyPlaying(false);
             logger.info("You ended the partida actual");
-            return this.playersList.get(iduser);
+            return this.usuario.get(iduser);
         }
         return null;
     }
-    
-
 
     @Override
-    public Partida getPartidaActual(String username)throws UserDoesNotExistException, UserNotCurrentlyPlayingException {
-        Usuario usuario = getPlayer(username);
-        if (usuario.getCurrentlyPlaying()){
-            List<Partida> partidasjugadas = (List<Partida>) usuario.getPartidasJugadas().values().stream().collect(toList());
-            logger.info("Partida actual: "+partidasjugadas.get(partidasjugadas.size()-1));
-            return partidasjugadas.get(partidasjugadas.size()-1);
+    public Integer getVidaEquipo(int numEquipo) throws EquipoNoExisteException {
+        int resultado = 0;
+        if (numEquipo < this.juego.getEquipos().size() - 1) {
+            Equipo equipo = this.juego.getEquipos().get(numEquipo);
+            resultado = equipo.getVida();
+            logger.info(resultado);
         }
-        logger.info("You are not playing right now!");
-        throw new UserNotCurrentlyPlayingException();
+        return resultado;
     }
-
 
     @Override
-    public int sizeGames() {
-        logger.info("There are "+juegos.size()+" juegos");
-        return juegos.size();
+    public void addUsuario(String idUsuario, String nombre, String apellido, int vida, int monedas) throws UserAlreadyExists {
+        if(listaUsuarios.contains(idUsuario)) {
+            logger.error("Este usuario ya existe");
+            throw new UserAlreadyExists();
+
+        }
+        else {
+            Usuario usuario = new Usuario(idUsuario,nombre,apellido,vida,monedas);
+            listaUsuarios.addLast(idUsuario);
+        }
     }
+
+
+
+
 
 
 }

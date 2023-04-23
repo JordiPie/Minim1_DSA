@@ -9,6 +9,8 @@ public class Partida {
     String idpartida;
     String idUsuario;
     Integer vidaJugador;
+    String estado;
+    List<Juego> partidas;
 
 
     public Partida() {
@@ -43,6 +45,19 @@ public class Partida {
         this.vidaJugador = vidaJugador;
     }
 
+    public void setPartidas(List<Juego> partidas) {
+        this.partidas = partidas;
+    }
+    public void addPartidas(Juego partidas){
+        this.partidas.add(partidas);
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
 
     @Override
     public String toString() {
